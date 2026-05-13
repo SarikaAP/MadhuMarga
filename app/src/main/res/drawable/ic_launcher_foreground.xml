@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Body of the bee -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M54,40c-11,0 -20,9 -20,20s9,20 20,20s20,-9 20,-20S65,40 54,40z" />
+    <!-- Stripes -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M38,55h32v4h-32zM36,65h36v4h-36z" />
+    <!-- Wings -->
+    <path
+        android:fillColor="#88FFFFFF"
+        android:pathData="M54,45c-5,-10 -20,-10 -20,0c0,5 5,10 10,10M54,45c5,-10 20,-10 20,0c0,5 -5,10 -10,10" />
+    <!-- Eyes -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M48,50a2,2 0,1 0,4 0a2,2 0,1 0,-4 0M56,50a2,2 0,1 0,4 0a2,2 0,1 0,-4 0" />
+</vector>
