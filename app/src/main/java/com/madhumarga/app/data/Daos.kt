@@ -6,6 +6,15 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
+interface UserDao {
+    @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
+    suspend fun getUserByEmail(email: String): UserEntity?
+
+    @Insert
+    suspend fun insertUser(user: UserEntity)
+}
+
+@Dao
 interface HiveDao {
     @Query("SELECT * FROM hives")
     fun getAllHives(): Flow<List<HiveEntity>>

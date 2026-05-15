@@ -3,6 +3,12 @@ package com.madhumarga.app.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Entity(tableName = "users")
+data class UserEntity(
+    @PrimaryKey val email: String,
+    val password: String
+)
+
 @Entity(tableName = "hives")
 data class HiveEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

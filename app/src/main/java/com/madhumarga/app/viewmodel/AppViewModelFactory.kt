@@ -9,6 +9,7 @@ class AppViewModelFactory(private val database: AppDatabase) : ViewModelProvider
         if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return AppViewModel(
+                database.userDao(),
                 database.hiveDao(),
                 database.inspectionDao(),
                 database.harvestDao()

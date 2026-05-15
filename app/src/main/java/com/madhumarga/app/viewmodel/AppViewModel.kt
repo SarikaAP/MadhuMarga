@@ -10,15 +10,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 data class UserProfile(
     val email: String = "",
-    val mobile: String = "",
     val uid: String = ""
 )
 
 class AppViewModel(
+    private val userDao: UserDao,
     private val hiveDao: HiveDao,
     private val inspectionDao: InspectionDao,
     private val harvestDao: HarvestDao
@@ -158,51 +157,53 @@ class AppViewModel(
         _alertMessage.value = null
     }
 
-    // --- Manual Login/Signup ---
+    // --- Local Login/Signup (No Firebase for Auth) ---
 
-    fun login(email: String, mobile: String, onSuccess: () -> Unit) {
+    fun login(email: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authError.value = null
             try {
-                Log.d(TAG, "Firestore: Attempting login for $email")
-                val doc = db.collection("users").document(email).get().await()
-                if (doc.exists()) {
-                    val savedMobile = doc.getString("mobile")
-                    if (savedMobile == mobile) {
-                        Log.d(TAG, "Firestore: Login successful")
-                        _currentUser.value = UserProfile(email, mobile, email)
+                Log.d(TAG, "Local: Attempting login for $email")
+                val user = userDao.getUserByEmail(email)
+                if (user != null) {
+                    if (user.password == password) {
+                        Log.d(TAG, "Local: Login successful")
+                        _currentUser.value = UserProfile(email, email)
                         onSuccess()
                     } else {
-                        Log.w(TAG, "Firestore: Incorrect mobile number")
-                        _authError.value = "Incorrect mobile number"
+                        Log.w(TAG, "Local: Incorrect password")
+                        _authError.value = "Incorrect password"
                     }
                 } else {
-                    Log.w(TAG, "Firestore: User not found")
+                    Log.w(TAG, "Local: User not found")
                     _authError.value = "User not found"
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Firestore: Login operation failed", e)
+                Log.e(TAG, "Local: Login operation failed", e)
                 _authError.value = e.message
             }
         }
     }
 
-    fun signup(email: String, mobile: String, onSuccess: () -> Unit) {
+    fun signup(email: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authError.value = null
             try {
-                Log.d(TAG, "Firestore: Attempting signup for $email")
-                val user = hashMapOf(
-                    "email" to email,
-                    "mobile" to mobile,
-                    "uid" to email
-                )
-                db.collection("users").document(email).set(user).await()
-                Log.d(TAG, "Firestore: Signup successful")
-                _currentUser.value = UserProfile(email, mobile, email)
+                Log.d(TAG, "Local: Attempting signup for $email")
+                val existingUser = userDao.getUserByEmail(email)
+                if (existingUser != null) {
+                    _authError.value = "User already exists"
+                    return@launch
+                }
+                
+                val newUser = UserEntity(email = email, password = password)
+                userDao.insertUser(newUser)
+                
+                Log.d(TAG, "Local: Signup successful")
+                _currentUser.value = UserProfile(email, email)
                 onSuccess()
             } catch (e: Exception) {
-                Log.e(TAG, "Firestore: Signup operation failed", e)
+                Log.e(TAG, "Local: Signup operation failed", e)
                 _authError.value = e.message
             }
         }

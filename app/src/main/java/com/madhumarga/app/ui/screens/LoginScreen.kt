@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.madhumarga.app.viewmodel.AppViewModel
@@ -14,7 +15,7 @@ import com.madhumarga.app.viewmodel.AppViewModel
 @Composable
 fun LoginScreen(viewModel: AppViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
-    var mobile by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     val authError by viewModel.authError.collectAsState()
 
     Column(
@@ -30,18 +31,19 @@ fun LoginScreen(viewModel: AppViewModel, navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Gmail Address") },
+            label = { Text("Email Address") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = mobile,
-            onValueChange = { mobile = it },
-            label = { Text("Mobile Number") },
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         
         authError?.let {
@@ -53,8 +55,8 @@ fun LoginScreen(viewModel: AppViewModel, navController: NavController) {
 
         Button(
             onClick = {
-                if (email.isNotBlank() && mobile.isNotBlank()) {
-                    viewModel.login(email, mobile) {
+                if (email.isNotBlank() && password.isNotBlank()) {
+                    viewModel.login(email, password) {
                         navController.navigate("dashboard") {
                             popUpTo("login") { inclusive = true }
                         }
